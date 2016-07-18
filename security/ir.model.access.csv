@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+hr_employee_all,hr_employee all,model_hr_employee,,1,1,0,0
+nantian_erp_certificate_all,nantian_erp_certificate all,model_nantian_erp_certificate,,1,1,1,0
+
