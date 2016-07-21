@@ -12,7 +12,7 @@ class hr_employee(models.Model):
     project_id = fields.Many2one('project.project',ondelete='set null',)
     analytic_line_id = fields.Many2one('account.analytic.line',ondelete='set null',)
     project_parent_id = fields.Many2one('account.analytic.account',compute='_compute_parent_project',store=True)
-    certificate_ids = fields.Many2many('nantian_erp.certificate',ondelete = 'set null',string="证书")
+    certificate_ids = fields.One2many('nantian_erp.certificate','employee_ids',ondelete = 'set null',string="证书")
     graduation = fields.Char(string="毕业学校")    
     major = fields.Char(string='专业')
     work_time = fields.Date()
@@ -126,23 +126,38 @@ class account_analytic_account(models.Model):
     @api.depends('name', 'employee_count')
     def name_get(self):
         return [(r.id, (r.name + '-'+u'所需人数'+  (str(r.need_employee_count)) +u'人')) for r in self]
-    
+
 class certificate(models.Model):
     _name = 'nantian_erp.certificate'
     _rec_name = 'name'
+    name = fields.Char(related='certificate_direction_id.name', store=True)
+    certificate_direction_id= fields.Many2one('nantian_erp.certificate_direction',string='方向')
+    certificate_category_id = fields.Many2one('nantian_erp.certificate_category', string='认证类型')
+    certificate_institutions_id = fields.Many2one('nantian_erp.certificate_institutions', string='颁发机构或行业')
+    certificate_level_id = fields.Many2one('nantian_erp.certificate_level', string='级别')
+    time = fields.Date(required=True,placeholder="截止日期",string="有效期")
+    employee_ids = fields.Many2one('hr.employee',ondelete='set null')
 
-    name = fields.Char(required=True,string='证书名')
-    category =fields.Selection(
-        [
-            (u'思科', u"思科"),
-            (u'华为', u"华为"),
-            (u'项目管理', u"项目管理"),
-            (u'红帽', u"红帽"),
-            ('juniper', "juniper"),
-            ('IBM', "IBM"),
-            ('Oracle', "Orcale"),
+class certificate_category(models.Model):
+    _name = 'nantian_erp.certificate_category'
+    _rec_name = 'name'
+    name = fields.Char(required=True, string='认证类型')
 
-        ],
-        string=u"证书类别"
-    )
-    employee_ids = fields.Many2many('hr.employee',ondelete='set null',)
+class certificate_institutions(models.Model):
+    _name = 'nantian_erp.certificate_institutions'
+    _rec_name = 'name'
+    name = fields.Char(string='机构')
+    category_id = fields.Many2one('nantian_erp.certificate_category', ondelete='set null', select=True)
+
+class certificate_direction(models.Model):
+    _name = 'nantian_erp.certificate_direction'
+    _rec_name = 'name'
+    name = fields.Char(string='方向')
+    institutions_id = fields.Many2one('nantian_erp.certificate_institutions', ondelete='set null', select=True)
+
+class certificate_level(models.Model):
+    _name = 'nantian_erp.certificate_level'
+    _rec_name = 'name'
+    name = fields.Char(string='级别')
+    direction_id = fields.Many2one('nantian_erp.certificate_direction', ondelete='set null', select=True)
+
