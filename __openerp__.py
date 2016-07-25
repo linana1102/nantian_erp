@@ -27,6 +27,7 @@
         'security/ir.model.access.csv',
         'security/server_desk_security.xml',
         'views/nantian_erp_view.xml',
+        'views/nantian_erp_menu.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
